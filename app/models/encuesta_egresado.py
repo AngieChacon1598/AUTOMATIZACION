@@ -42,7 +42,8 @@ class EncuestaEgresado(db.Model):
     # tipo_negocio no existe en la base de datos actual - removido
     cantidad_trabajadores = db.Column(db.String(50))  # Rangos de trabajadores
     # 'Persona natural con RUC', 'EIRL', 'SRL', etc.
-    tipo_constitucion = db.Column(db.String(50))
+    # Nota: La columna en BD se llama tipo_constituccion (doble 'c')
+    tipo_constitucion = db.Column('tipo_constituccion', db.String(50))
     actividad_economica_negocio_id = db.Column(
         db.Integer, db.ForeignKey('actividad_economica.id_actividad'))
 
