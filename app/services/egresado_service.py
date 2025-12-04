@@ -326,7 +326,12 @@ def crear_egresado_con_detalle(data):
         )
         db.session.add(nuevo_egresado)
 
+        # Remover el campo estado del detalle si viene (no se permite modificar en creación)
+        if 'estado' in datos_detalle:
+            del datos_detalle['estado']
+        
         # Crear detalle del egresado (usar el código del egresado)
+        # El estado siempre se establece como 'A' (activo) - no se permite modificar en creación
         nuevo_detalle = DetalleEgresado(
             codigo_egresado=datos_egresado['codigo'],  # Usar el código del egresado creado
             fecha_egreso=datos_detalle.get('fecha_egreso'),
@@ -337,7 +342,7 @@ def crear_egresado_con_detalle(data):
             fecha_incorporacion=datos_detalle.get('fecha_incorporacion'),
             area_trabajo=datos_detalle.get('area_trabajo'),
             sueldo_actual=datos_detalle.get('sueldo_actual'),
-            estado=datos_detalle.get('estado', 'A')
+            estado='A'  # Siempre se establece como 'A' (activo) - no se permite modificar
         )
         db.session.add(nuevo_detalle)
 
@@ -399,6 +404,7 @@ def actualizar_egresado_con_detalle(codigo, data):
         if datos_detalle:
             if not detalle:
                 # Si no existe detalle, crear uno nuevo
+                # El estado siempre se establece como 'A' (activo) - no se permite modificar en creación
                 nuevo_detalle = DetalleEgresado(
                     codigo_egresado=codigo,
                     fecha_egreso=datos_detalle.get('fecha_egreso'),
@@ -409,7 +415,7 @@ def actualizar_egresado_con_detalle(codigo, data):
                     fecha_incorporacion=datos_detalle.get('fecha_incorporacion'),
                     area_trabajo=datos_detalle.get('area_trabajo'),
                     sueldo_actual=datos_detalle.get('sueldo_actual'),
-                    estado=datos_detalle.get('estado', 'A')
+                    estado='A'  # Siempre se establece como 'A' (activo) - no se permite modificar
                 )
                 db.session.add(nuevo_detalle)
                 detalle = nuevo_detalle

@@ -70,7 +70,8 @@ class DetalleEgresadoSchema(Schema):
     fecha_incorporacion = fields.Date(allow_none=True)
     area_trabajo = fields.String(allow_none=True)
     sueldo_actual = fields.Decimal(allow_none=True)
-    estado = fields.String(validate=validate.OneOf(["A", "I"]), load_default="A")
+    # estado no se permite en creación - se establece automáticamente como 'A'
+    estado = fields.String(dump_only=True)  # Solo para serialización, no se acepta en creación
 
 # Schema para DetalleEgresado sin codigo_egresado (se asigna automáticamente)
 class DetalleEgresadoSinCodigoSchema(Schema):
@@ -82,7 +83,8 @@ class DetalleEgresadoSinCodigoSchema(Schema):
     fecha_incorporacion = fields.Date(allow_none=True)
     area_trabajo = fields.String(allow_none=True)
     sueldo_actual = fields.Decimal(allow_none=True)
-    estado = fields.String(validate=validate.OneOf(["A", "I"]), load_default="A")
+    # estado no se permite en creación - se establece automáticamente como 'A'
+    estado = fields.String(dump_only=True)  # Solo para serialización, no se acepta en creación
 
 # Schema combinado para crear Egresado con Detalle en una sola transacción (estructura anidada)
 class EgresadoConDetalleSchema(Schema):

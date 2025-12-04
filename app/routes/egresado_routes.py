@@ -198,6 +198,10 @@ def get_detalle_egresado(id_detalle):
 def create_detalle_egresado():
     """Crear nuevo detalle de egresado"""
     data = request.get_json()
+    
+    # Remover el campo estado si viene en el request (no se permite modificar en creación)
+    if 'estado' in data:
+        del data['estado']
 
     # Validar datos usando Marshmallow
     schema = DetalleEgresadoSchema()
@@ -210,6 +214,9 @@ def create_detalle_egresado():
     egresado = Egresado.query.get(validated_data['codigo_egresado'])
     if not egresado:
         return jsonify({'message': 'Egresado no encontrado'}), 404
+
+    # Establecer estado automáticamente como 'A' (activo)
+    validated_data['estado'] = 'A'
 
     # Crear nuevo detalle
     nuevo_detalle = DetalleEgresado(**validated_data)
