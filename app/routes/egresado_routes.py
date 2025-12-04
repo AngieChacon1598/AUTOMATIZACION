@@ -1,6 +1,8 @@
 # Endpoints relacionados con egresados
 from flask import Blueprint, request, jsonify, render_template
 from marshmallow import ValidationError
+from sqlalchemy.exc import OperationalError
+import time
 from ..models.egresado import Egresado
 from ..models.detalle_egresado import DetalleEgresado
 from ..models.schemas import EgresadoSchema, DetalleEgresadoSchema, EgresadoUpdateSchema, EgresadoConDetalleSchema, EgresadoConDetalleUpdateSchema
@@ -249,33 +251,61 @@ def update_detalle_egresado(id_detalle):
 
 @egresado_bp.route('/detalle-egresados/<int:id_detalle>', methods=['DELETE'])
 def delete_detalle_egresado_logico(id_detalle):
-    """Eliminar detalle de egresado lógicamente"""
-    detalle = DetalleEgresado.query.get(id_detalle)
-    if not detalle:
-        return jsonify({'message': 'Detalle de egresado no encontrado'}), 404
-
-    try:
-        detalle.estado = 'I'
-        db.session.commit()
-        return jsonify({'message': 'Detalle eliminado exitosamente'}), 200
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({'message': f'Error al eliminar el detalle: {str(e)}'}), 500
+    """Eliminar detalle de egresado lógicamente con retry para manejo de errores de conexión"""
+    max_retries = 3
+    retry_delay = 1
+    
+    for attempt in range(max_retries):
+        try:
+            detalle = DetalleEgresado.query.get(id_detalle)
+            if not detalle:
+                return jsonify({'message': 'Detalle de egresado no encontrado'}), 404
+            
+            detalle.estado = 'I'
+            db.session.commit()
+            return jsonify({'message': 'Detalle eliminado exitosamente'}), 200
+        
+        except OperationalError as e:
+            if attempt < max_retries - 1:
+                db.session.rollback()
+                time.sleep(retry_delay)
+                continue
+            else:
+                return jsonify({
+                    'message': 'Error de conexión con la base de datos. Por favor, intenta nuevamente.'
+                }), 500
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({'message': f'Error al eliminar el detalle: {str(e)}'}), 500
 
 @egresado_bp.route('/detalle-egresados/restaurar/<int:id_detalle>', methods=['PUT'])
 def restaurar_detalle_egresado(id_detalle):
-    """Restaurar detalle de egresado eliminado lógicamente"""
-    detalle = DetalleEgresado.query.get(id_detalle)
-    if not detalle:
-        return jsonify({'message': 'Detalle de egresado no encontrado'}), 404
-
-    try:
-        detalle.estado = 'A'
-        db.session.commit()
-        return jsonify({'message': 'Detalle restaurado exitosamente'}), 200
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({'message': f'Error al restaurar el detalle: {str(e)}'}), 500
+    """Restaurar detalle de egresado eliminado lógicamente con retry para manejo de errores de conexión"""
+    max_retries = 3
+    retry_delay = 1
+    
+    for attempt in range(max_retries):
+        try:
+            detalle = DetalleEgresado.query.get(id_detalle)
+            if not detalle:
+                return jsonify({'message': 'Detalle de egresado no encontrado'}), 404
+            
+            detalle.estado = 'A'
+            db.session.commit()
+            return jsonify({'message': 'Detalle restaurado exitosamente'}), 200
+        
+        except OperationalError as e:
+            if attempt < max_retries - 1:
+                db.session.rollback()
+                time.sleep(retry_delay)
+                continue
+            else:
+                return jsonify({
+                    'message': 'Error de conexión con la base de datos. Por favor, intenta nuevamente.'
+                }), 500
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({'message': f'Error al restaurar el detalle: {str(e)}'}), 500
 
 @egresado_bp.route('/detalle-egresados/fisico/<int:id_detalle>', methods=['DELETE'])
 def delete_detalle_egresado_fisico(id_detalle):

@@ -194,34 +194,62 @@ def actualizar_egresado(codigo, data):
         return {'error': f'Error al actualizar el egresado: {str(e)}'}, 500
 
 def eliminar_egresado_logico(codigo):
-    """Eliminar egresado lógicamente (cambiar estado a 'I')"""
-    egresado = Egresado.query.get(codigo)
-    if not egresado:
-        return {'error': 'Egresado no encontrado'}, 404
+    """Eliminar egresado lógicamente (cambiar estado a 'I') con retry para manejo de errores de conexión"""
+    from sqlalchemy.exc import OperationalError
+    import time
     
-    try:
-        egresado.estado = 'I'
-        db.session.commit()
-        return {'message': 'Egresado eliminado exitosamente'}, 200
+    max_retries = 3
+    retry_delay = 1
+    
+    for attempt in range(max_retries):
+        try:
+            egresado = Egresado.query.get(codigo)
+            if not egresado:
+                return {'error': 'Egresado no encontrado'}, 404
+            
+            egresado.estado = 'I'
+            db.session.commit()
+            return {'message': 'Egresado eliminado exitosamente'}, 200
         
-    except Exception as e:
-        db.session.rollback()
-        return {'error': f'Error al eliminar el egresado: {str(e)}'}, 500
+        except OperationalError as e:
+            if attempt < max_retries - 1:
+                db.session.rollback()
+                time.sleep(retry_delay)
+                continue
+            else:
+                return {'error': 'Error de conexión con la base de datos. Por favor, intenta nuevamente.'}, 500
+        except Exception as e:
+            db.session.rollback()
+            return {'error': f'Error al eliminar el egresado: {str(e)}'}, 500
 
 def restaurar_egresado(codigo):
-    """Restaurar egresado eliminado lógicamente"""
-    egresado = Egresado.query.get(codigo)
-    if not egresado:
-        return {'error': 'Egresado no encontrado'}, 404
+    """Restaurar egresado eliminado lógicamente con retry para manejo de errores de conexión"""
+    from sqlalchemy.exc import OperationalError
+    import time
     
-    try:
-        egresado.estado = 'A'
-        db.session.commit()
-        return {'message': 'Egresado restaurado exitosamente'}, 200
+    max_retries = 3
+    retry_delay = 1
+    
+    for attempt in range(max_retries):
+        try:
+            egresado = Egresado.query.get(codigo)
+            if not egresado:
+                return {'error': 'Egresado no encontrado'}, 404
+            
+            egresado.estado = 'A'
+            db.session.commit()
+            return {'message': 'Egresado restaurado exitosamente'}, 200
         
-    except Exception as e:
-        db.session.rollback()
-        return {'error': f'Error al restaurar el egresado: {str(e)}'}, 500
+        except OperationalError as e:
+            if attempt < max_retries - 1:
+                db.session.rollback()
+                time.sleep(retry_delay)
+                continue
+            else:
+                return {'error': 'Error de conexión con la base de datos. Por favor, intenta nuevamente.'}, 500
+        except Exception as e:
+            db.session.rollback()
+            return {'error': f'Error al restaurar el egresado: {str(e)}'}, 500
 
 def eliminar_egresado_fisico(codigo):
     """Eliminar egresado físicamente de la base de datos"""

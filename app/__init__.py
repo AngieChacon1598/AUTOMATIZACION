@@ -2,6 +2,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
+from sqlalchemy.pool import QueuePool
 from .settings import SQLALCHEMY_DATABASE_URI
 
 # Inicialización de la app Flask
@@ -10,12 +11,18 @@ app = Flask(__name__)
 # Configuración CORS - Permitir todos los orígenes
 CORS(app)
 
-# Configuración de la base de datos
+# Configuración de la base de datos con pool de conexiones y reconexión
 app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+    'poolclass': QueuePool,
+    'pool_size': 5,
+    'max_overflow': 10,
+    'pool_pre_ping': True,  # ⭐ IMPORTANTE: Verifica conexiones antes de usarlas
+    'pool_recycle': 3600,   # Recicla conexiones cada hora
     'connect_args': {
-        'sslmode': 'require'
+        'sslmode': 'require',
+        'connect_timeout': 10
     }
 }
 db = SQLAlchemy(app)

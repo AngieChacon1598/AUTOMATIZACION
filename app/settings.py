@@ -37,8 +37,9 @@ DB_CONFIG = {
 # URI de conexión para SQLAlchemy
 if DB_CONFIG['type'] == 'postgresql':
     # SSL opcional - configurable desde env
-    sslmode = os.getenv('DB_SSLMODE', 'disable')  # disable para desarrollo local, require para producción
-    SQLALCHEMY_DATABASE_URI = f"postgresql://{DB_CONFIG['user']}:{DB_CONFIG['password']}@{DB_CONFIG['host']}:{DB_CONFIG['port']}/{DB_CONFIG['database']}?sslmode={sslmode}"
+    sslmode = os.getenv('DB_SSLMODE', 'require')  # require para producción (cambiar a disable solo para desarrollo local)
+    # Agregar parámetros adicionales para mejorar la estabilidad de la conexión
+    SQLALCHEMY_DATABASE_URI = f"postgresql://{DB_CONFIG['user']}:{DB_CONFIG['password']}@{DB_CONFIG['host']}:{DB_CONFIG['port']}/{DB_CONFIG['database']}?sslmode={sslmode}&connect_timeout=10"
 else:
     SQLALCHEMY_DATABASE_URI = f"sqlite:///{DB_CONFIG['database']}.db"
 
