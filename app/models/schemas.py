@@ -115,16 +115,14 @@ class EgresadoConDetalleUpdateSchema(Schema):
     detalle = fields.Nested(DetalleEgresadoUpdateSchema, allow_none=True)
 
 # Schema de Marshmallow para validaciones de Encuesta Egresado
+# Solo incluye campos que existen en la base de datos actual
 class EncuestaEgresadoSchema(Schema):
     codigo_egresado = fields.String(required=True, validate=validate.Length(min=1))
     fecha_aplicacion = fields.Date(required=True)
     trabaja_actualmente = fields.Boolean(allow_none=True)
-    puesto_actual = fields.String(allow_none=True)
     tiene_negocio = fields.Boolean(allow_none=True)
-    tipo_negocio = fields.String(allow_none=True)
     ingreso_mensual = fields.String(allow_none=True)
     ingresos_mensuales = fields.String(allow_none=True)  # Alias de ingreso_mensual
-    observaciones = fields.String(allow_none=True)
     tipo_contrato = fields.String(allow_none=True)
     tipo_empleo = fields.String(allow_none=True)
     area_trabajo = fields.String(allow_none=True)
@@ -144,16 +142,14 @@ class EncuestaEgresadoSchema(Schema):
     estado = fields.String(validate=validate.OneOf(["A", "I"]), load_default="A", allow_none=True)
 
 # Schema para actualizar Encuesta Egresado (todos los campos opcionales excepto los requeridos)
+# Solo incluye campos que existen en la base de datos actual
 class EncuestaEgresadoUpdateSchema(Schema):
     codigo_egresado = fields.String(allow_none=True, validate=validate.Length(min=1))
     fecha_aplicacion = fields.Date(allow_none=True)
     trabaja_actualmente = fields.Boolean(allow_none=True)
-    puesto_actual = fields.String(allow_none=True)
     tiene_negocio = fields.Boolean(allow_none=True)
-    tipo_negocio = fields.String(allow_none=True)
     ingreso_mensual = fields.String(allow_none=True)
     ingresos_mensuales = fields.String(allow_none=True)  # Alias de ingreso_mensual
-    observaciones = fields.String(allow_none=True)
     tipo_contrato = fields.String(allow_none=True)
     tipo_empleo = fields.String(allow_none=True)
     area_trabajo = fields.String(allow_none=True)

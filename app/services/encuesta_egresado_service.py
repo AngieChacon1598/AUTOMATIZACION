@@ -40,12 +40,11 @@ def crear_encuesta(data):
         if not egresado:
             return {'message': 'Egresado no encontrado'}, 404
 
-        # Crear nueva encuesta
+        # Crear nueva encuesta (solo con campos que existen en la BD)
         nueva_encuesta = EncuestaEgresado(
             codigo_egresado=data.get('codigo_egresado'),
             fecha_aplicacion=data.get('fecha_aplicacion'),
             trabaja_actualmente=data.get('trabaja_actualmente'),
-            puesto_actual=data.get('puesto_actual'),
             tipo_contrato=data.get('tipo_contrato'),
             tipo_empleo=data.get('tipo_empleo'),
             ingreso_mensual=data.get('ingreso_mensual'),
@@ -61,11 +60,9 @@ def crear_encuesta(data):
             pagina_web_empresa=data.get('pagina_web_empresa'),
             correo_empresa=data.get('correo_empresa'),
             tiene_negocio=data.get('tiene_negocio', False),
-            tipo_negocio=data.get('tipo_negocio'),
             cantidad_trabajadores=data.get('cantidad_trabajadores'),
             tipo_constitucion=data.get('tipo_constitucion'),
             actividad_economica_negocio_id=data.get('actividad_economica_negocio_id'),
-            observaciones=data.get('observaciones'),
             estado=data.get('estado', 'A')
         )
 
@@ -154,9 +151,20 @@ def actualizar_encuesta(id_encuesta, data):
         if 'tiene_negocio' in data:
             data['tiene_negocio'] = normalize_bool(data['tiene_negocio'])
         
-        # Actualizar campos
+        # Actualizar campos (solo los que existen en la BD)
+        campos_permitidos = [
+            'codigo_egresado', 'fecha_aplicacion', 'trabaja_actualmente',
+            'tipo_contrato', 'tipo_empleo', 'ingreso_mensual', 'area_trabajo',
+            'actividad_economica_id', 'relacion_carrera', 'medios_busqueda',
+            'cantidad_empleos_ultimo_ano', 'cantidad_empleos_carrera',
+            'nombre_empresa_actual', 'nombre_jefe_inmediato', 'telefono_empresa',
+            'pagina_web_empresa', 'correo_empresa', 'tiene_negocio',
+            'cantidad_trabajadores', 'tipo_constitucion',
+            'actividad_economica_negocio_id', 'estado'
+        ]
+        
         for key, value in data.items():
-            if hasattr(encuesta, key) and key != 'id_encuesta' and key != 'ingresos_mensuales':
+            if key in campos_permitidos and key != 'id_encuesta' and key != 'ingresos_mensuales':
                 setattr(encuesta, key, value)
 
         db.session.commit()

@@ -12,7 +12,7 @@ class EncuestaEgresado(db.Model):
 
     # SITUACIÓN LABORAL
     trabaja_actualmente = db.Column(db.Boolean)
-    puesto_actual = db.Column(db.String(255))  # Campo agregado según manual
+    # puesto_actual no existe en la base de datos actual - removido
     # 'Contrato de trabajo', 'Recibo por honorario', 'Ninguna'
     tipo_contrato = db.Column(db.String(50))
     # 'Institución pública', 'Empresa privada', 'Independiente'
@@ -39,15 +39,14 @@ class EncuestaEgresado(db.Model):
 
     # TRABAJO INDEPENDIENTE
     tiene_negocio = db.Column(db.Boolean, default=False)
-    tipo_negocio = db.Column(db.String(255))  # Campo agregado según manual
+    # tipo_negocio no existe en la base de datos actual - removido
     cantidad_trabajadores = db.Column(db.String(50))  # Rangos de trabajadores
     # 'Persona natural con RUC', 'EIRL', 'SRL', etc.
     tipo_constitucion = db.Column(db.String(50))
     actividad_economica_negocio_id = db.Column(
         db.Integer, db.ForeignKey('actividad_economica.id_actividad'))
 
-    # Campo adicional según manual
-    observaciones = db.Column(db.Text)
+    # observaciones no existe en la base de datos actual - removido
 
     estado = db.Column(db.String(1), nullable=False, default='A')
 
@@ -57,7 +56,6 @@ class EncuestaEgresado(db.Model):
             'codigo_egresado': self.codigo_egresado,
             'fecha_aplicacion': self.fecha_aplicacion.isoformat() if self.fecha_aplicacion else None,
             'trabaja_actualmente': self.trabaja_actualmente,
-            'puesto_actual': self.puesto_actual,
             'tipo_contrato': self.tipo_contrato,
             'tipo_empleo': self.tipo_empleo,
             'ingreso_mensual': self.ingreso_mensual,
@@ -74,10 +72,8 @@ class EncuestaEgresado(db.Model):
             'pagina_web_empresa': self.pagina_web_empresa,
             'correo_empresa': self.correo_empresa,
             'tiene_negocio': self.tiene_negocio,
-            'tipo_negocio': self.tipo_negocio,
             'cantidad_trabajadores': self.cantidad_trabajadores,
             'tipo_constitucion': self.tipo_constitucion,
             'actividad_economica_negocio_id': self.actividad_economica_negocio_id,
-            'observaciones': self.observaciones,
             'estado': self.estado
         }
