@@ -7,16 +7,45 @@ from .. import db
 def crear_encuesta(data):
     """Crear una nueva encuesta de egresado"""
     try:
+        # Normalizar alias: ingresos_mensuales -> ingreso_mensual
+        if 'ingresos_mensuales' in data and 'ingreso_mensual' not in data:
+            data['ingreso_mensual'] = data.pop('ingresos_mensuales')
+        
+        # Normalizar booleanos (aceptar string, int, bool)
+        def normalize_bool(value):
+            if value is None:
+                return None
+            if isinstance(value, bool):
+                return value
+            if isinstance(value, str):
+                return value.lower() in ('true', '1', 'si', 'yes', 'y')
+            if isinstance(value, int):
+                return bool(value)
+            return None
+        
+        # Normalizar campos booleanos
+        if 'trabaja_actualmente' in data:
+            data['trabaja_actualmente'] = normalize_bool(data['trabaja_actualmente'])
+        if 'tiene_negocio' in data:
+            data['tiene_negocio'] = normalize_bool(data['tiene_negocio'])
+        
+        # Validar campos requeridos
+        if not data.get('codigo_egresado'):
+            return {'message': 'codigo_egresado es requerido'}, 400
+        if not data.get('fecha_aplicacion'):
+            return {'message': 'fecha_aplicacion es requerido'}, 400
+        
         # Verificar que el egresado existe
         egresado = Egresado.query.get(data.get('codigo_egresado'))
         if not egresado:
-            return {'error': 'Egresado no encontrado'}, 404
+            return {'message': 'Egresado no encontrado'}, 404
 
         # Crear nueva encuesta
         nueva_encuesta = EncuestaEgresado(
             codigo_egresado=data.get('codigo_egresado'),
             fecha_aplicacion=data.get('fecha_aplicacion'),
             trabaja_actualmente=data.get('trabaja_actualmente'),
+            puesto_actual=data.get('puesto_actual'),
             tipo_contrato=data.get('tipo_contrato'),
             tipo_empleo=data.get('tipo_empleo'),
             ingreso_mensual=data.get('ingreso_mensual'),
@@ -24,8 +53,7 @@ def crear_encuesta(data):
             actividad_economica_id=data.get('actividad_economica_id'),
             relacion_carrera=data.get('relacion_carrera'),
             medios_busqueda=data.get('medios_busqueda'),
-            cantidad_empleos_ultimo_ano=data.get(
-                'cantidad_empleos_ultimo_ano', 0),
+            cantidad_empleos_ultimo_ano=data.get('cantidad_empleos_ultimo_ano', 0),
             cantidad_empleos_carrera=data.get('cantidad_empleos_carrera', 0),
             nombre_empresa_actual=data.get('nombre_empresa_actual'),
             nombre_jefe_inmediato=data.get('nombre_jefe_inmediato'),
@@ -33,10 +61,11 @@ def crear_encuesta(data):
             pagina_web_empresa=data.get('pagina_web_empresa'),
             correo_empresa=data.get('correo_empresa'),
             tiene_negocio=data.get('tiene_negocio', False),
+            tipo_negocio=data.get('tipo_negocio'),
             cantidad_trabajadores=data.get('cantidad_trabajadores'),
             tipo_constitucion=data.get('tipo_constitucion'),
-            actividad_economica_negocio_id=data.get(
-                'actividad_economica_negocio_id'),
+            actividad_economica_negocio_id=data.get('actividad_economica_negocio_id'),
+            observaciones=data.get('observaciones'),
             estado=data.get('estado', 'A')
         )
 
@@ -47,7 +76,7 @@ def crear_encuesta(data):
 
     except Exception as e:
         db.session.rollback()
-        return {'error': f'Error al crear la encuesta: {str(e)}'}, 500
+        return {'message': f'Error al crear la encuesta: {str(e)}'}, 500
 
 def obtener_encuestas(filtros, page=1, per_page=10):
     """Obtener lista de encuestas con filtros y paginación"""
@@ -79,12 +108,13 @@ def obtener_encuestas(filtros, page=1, per_page=10):
     # Paginar
     pagination = query.paginate(page=page, per_page=per_page, error_out=False)
 
+    # Retornar estructura según manual (encuestas en lugar de data)
     return {
-        "total": pagination.total,
-        "pages": pagination.pages,
-        "current_page": pagination.page,
+        "encuestas": [e.to_dict() for e in pagination.items],
+        "page": pagination.page,
         "per_page": pagination.per_page,
-        "data": [e.to_dict() for e in pagination.items]
+        "total": pagination.total,
+        "pages": pagination.pages
     }
 
 
@@ -92,7 +122,7 @@ def obtener_encuesta(id_encuesta):
     """Obtener una encuesta específica"""
     encuesta = EncuestaEgresado.query.get(id_encuesta)
     if not encuesta:
-        return {'error': 'Encuesta no encontrada'}, 404
+        return {'message': 'Encuesta no encontrada'}, 404
     return encuesta.to_dict(), 200
 
 
@@ -100,12 +130,33 @@ def actualizar_encuesta(id_encuesta, data):
     """Actualizar una encuesta existente"""
     encuesta = EncuestaEgresado.query.get(id_encuesta)
     if not encuesta:
-        return {'error': 'Encuesta no encontrada'}, 404
+        return {'message': 'Encuesta no encontrada'}, 404
 
     try:
+        # Normalizar alias: ingresos_mensuales -> ingreso_mensual
+        if 'ingresos_mensuales' in data and 'ingreso_mensual' not in data:
+            data['ingreso_mensual'] = data.pop('ingresos_mensuales')
+        
+        # Normalizar booleanos
+        def normalize_bool(value):
+            if value is None:
+                return None
+            if isinstance(value, bool):
+                return value
+            if isinstance(value, str):
+                return value.lower() in ('true', '1', 'si', 'yes', 'y')
+            if isinstance(value, int):
+                return bool(value)
+            return None
+        
+        if 'trabaja_actualmente' in data:
+            data['trabaja_actualmente'] = normalize_bool(data['trabaja_actualmente'])
+        if 'tiene_negocio' in data:
+            data['tiene_negocio'] = normalize_bool(data['tiene_negocio'])
+        
         # Actualizar campos
         for key, value in data.items():
-            if hasattr(encuesta, key) and key != 'id_encuesta':
+            if hasattr(encuesta, key) and key != 'id_encuesta' and key != 'ingresos_mensuales':
                 setattr(encuesta, key, value)
 
         db.session.commit()
@@ -113,7 +164,7 @@ def actualizar_encuesta(id_encuesta, data):
 
     except Exception as e:
         db.session.rollback()
-        return {'error': f'Error al actualizar la encuesta: {str(e)}'}, 500
+        return {'message': f'Error al actualizar la encuesta: {str(e)}'}, 500
 
 
 def eliminar_encuesta_logica(id_encuesta):
@@ -122,41 +173,33 @@ def eliminar_encuesta_logica(id_encuesta):
     encuesta = EncuestaEgresado.query.get(id_encuesta)
 
     if encuesta is None:
-        return {'error': 'Encuesta no encontrada'}, 404
-
-    # Ya está eliminada
-    if encuesta.estado == 'I':
-        return {'message': 'La encuesta ya está inactiva'}, 400
+        return {'message': 'Encuesta no encontrada'}, 404
 
     try:
         encuesta.estado = 'I'
         db.session.commit()
-        return {'message': 'Encuesta eliminada lógicamente'}, 200
+        return {'message': 'Encuesta eliminada exitosamente', 'id_encuesta': id_encuesta}, 200
 
     except Exception as e:
         db.session.rollback()
-        return {'error': f'Ocurrió un error al actualizar: {str(e)}'}, 500
+        return {'message': f'Error al eliminar la encuesta: {str(e)}'}, 500
 
 def restaurar_encuesta_logica(id_encuesta):
-    """Eliminación lógica de una encuesta (cambia estado a 'A')."""
+    """Restaurar encuesta eliminada lógicamente (cambia estado a 'A')."""
 
     encuesta = EncuestaEgresado.query.get(id_encuesta)
 
     if encuesta is None:
-        return {'error': 'Encuesta no encontrada'}, 404
-
-    # Ya está restaurada
-    if encuesta.estado == 'A':
-        return {'message': 'La encuesta ya está inactiva'}, 400
+        return {'message': 'Encuesta no encontrada'}, 404
 
     try:
         encuesta.estado = 'A'
         db.session.commit()
-        return {'message': 'Encuesta restaurada lógicamente'}, 200
+        return {'message': 'Encuesta restaurada exitosamente', 'id_encuesta': id_encuesta, 'estado': 'A'}, 200
 
     except Exception as e:
         db.session.rollback()
-        return {'error': f'Ocurrió un error al actualizar: {str(e)}'}, 500
+        return {'message': f'Error al restaurar la encuesta: {str(e)}'}, 500
 
 
 def obtener_estadisticas_encuestas(codigo_egresado=None):
@@ -168,15 +211,21 @@ def obtener_estadisticas_encuestas(codigo_egresado=None):
             query = query.filter_by(codigo_egresado=codigo_egresado)
 
         total_encuestas = query.count()
+        encuestas_activas = query.filter_by(estado='A').count()
+        encuestas_inactivas = EncuestaEgresado.query.filter_by(estado='I').count()
+        if codigo_egresado:
+            encuestas_inactivas = EncuestaEgresado.query.filter_by(estado='I', codigo_egresado=codigo_egresado).count()
+        
         trabaja_actualmente = query.filter_by(trabaja_actualmente=True).count()
         tiene_negocio = query.filter_by(tiene_negocio=True).count()
 
         return {
             'total_encuestas': total_encuestas,
-            'trabaja_actualmente': trabaja_actualmente,
-            'tiene_negocio': tiene_negocio,
-            'desempleado': total_encuestas - trabaja_actualmente - tiene_negocio
+            'encuestas_activas': encuestas_activas,
+            'encuestas_inactivas': encuestas_inactivas,
+            'trabajan_actualmente': trabaja_actualmente,
+            'tienen_negocio': tiene_negocio
         }, 200
 
     except Exception as e:
-        return {'error': f'Error al obtener estadísticas: {str(e)}'}, 500
+        return {'message': f'Error al obtener estadísticas: {str(e)}'}, 500

@@ -1,6 +1,8 @@
 # Endpoints relacionados con encuestas de egresados
 from flask import Blueprint, request, jsonify
+from marshmallow import ValidationError
 from ..models.encuesta_egresado import EncuestaEgresado
+from ..models.schemas import EncuestaEgresadoSchema, EncuestaEgresadoUpdateSchema
 from ..services.encuesta_egresado_service import (
     crear_encuesta, obtener_encuestas, obtener_encuesta,
     actualizar_encuesta, eliminar_encuesta_logica, obtener_estadisticas_encuestas ,restaurar_encuesta_logica
@@ -64,12 +66,18 @@ def listar_encuestas():
 def agregar_encuesta():
     """Agregar nueva encuesta de egresado"""
     data = request.get_json()
+    
+    if not data:
+        return jsonify({'message': 'No se proporcionaron datos'}), 400
 
-    # Validar datos requeridos
-    if not data.get('codigo_egresado') or not data.get('fecha_aplicacion'):
-        return jsonify({'message': 'Código de egresado y fecha de aplicación son requeridos'}), 400
+    # Validar datos usando Marshmallow
+    schema = EncuestaEgresadoSchema()
+    try:
+        validated_data = schema.load(data)
+    except ValidationError as err:
+        return jsonify({'message': 'Error de validación', 'errors': err.messages}), 400
 
-    resultado, codigo_respuesta = crear_encuesta(data)
+    resultado, codigo_respuesta = crear_encuesta(validated_data)
     return jsonify(resultado), codigo_respuesta
 
 
@@ -85,8 +93,18 @@ def obtener_una_encuesta(id_encuesta):
 def editar_encuesta(id_encuesta):
     """Editar encuesta existente"""
     data = request.get_json()
+    
+    if not data:
+        return jsonify({'message': 'No se proporcionaron datos'}), 400
 
-    resultado, codigo_respuesta = actualizar_encuesta(id_encuesta, data)
+    # Validar datos usando Marshmallow (todos los campos opcionales en actualización)
+    schema = EncuestaEgresadoUpdateSchema()
+    try:
+        validated_data = schema.load(data)
+    except ValidationError as err:
+        return jsonify({'message': 'Error de validación', 'errors': err.messages}), 400
+
+    resultado, codigo_respuesta = actualizar_encuesta(id_encuesta, validated_data)
     return jsonify(resultado), codigo_respuesta
 
 
