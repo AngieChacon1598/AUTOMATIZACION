@@ -1,0 +1,17 @@
+# Ignore local env files and virtual environments
+config.env
+env.example
+SegEgresados/
+__pycache__
+.venv
+venv
+*.pyc
+.pytest_cache
+.DS_Store
+build/
+dist/
+.mypy_cache
+.vscode
+*.egg-info
+.git
+/.gitignore

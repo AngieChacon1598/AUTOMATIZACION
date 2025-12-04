@@ -1,0 +1,50 @@
+services:
+  - type: web
+    name: seguimiento-egresados-backend
+    runtime: docker
+    plan: starter
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    envVars:
+      # Base de datos - Configurar con tus valores reales en el dashboard de Render
+      - key: DB_TYPE
+        value: postgresql
+      - key: DB_HOST
+        sync: false  # Configurar manualmente en Render
+      - key: DB_PORT
+        value: 5432
+      - key: DB_NAME
+        sync: false  # Configurar manualmente en Render
+      - key: DB_USER
+        sync: false  # Configurar manualmente en Render
+      - key: DB_PASSWORD
+        sync: false  # Configurar manualmente en Render (usar Secret)
+      - key: DB_SSLMODE
+        value: require
+      
+      # JWT
+      - key: JWT_SECRET_KEY
+        sync: false  # Configurar manualmente en Render (usar Secret)
+      - key: JWT_ALGORITHM
+        value: HS256
+      - key: JWT_EXPIRATION_HOURS
+        value: 24
+      
+      # Seguridad
+      - key: MAX_LOGIN_ATTEMPTS
+        value: 5
+      - key: LOCKOUT_DURATION_MINUTES
+        value: 30
+      
+      # Google Script
+      - key: GOOGLE_SCRIPT_URL
+        sync: false  # Configurar manualmente en Render
+      
+      # Flask
+      - key: FLASK_ENV
+        value: production
+      - key: FLASK_DEBUG
+        value: False
+      - key: GUNICORN_WORKERS
+        value: 3
+
