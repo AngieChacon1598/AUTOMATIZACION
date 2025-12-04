@@ -1,0 +1,136 @@
+(psycopg2.errors.UndefinedColumn) column encuesta_egresado.tipo_constitucion does not exist
+LINE 1: ...dores AS encuesta_egresado_cantidad_trabajadores, encuesta_e...
+                                                             ^
+HINT:  Perhaps you meant to reference the column "encuesta_egresado.tipo_constituccion".
+
+[SQL: SELECT encuesta_egresado.id_encuesta AS encuesta_egresado_id_encuesta, encuesta_egresado.codigo_egresado AS encuesta_egresado_codigo_egresado, encuesta_egresado.fecha_aplicacion AS encuesta_egresado_fecha_aplicacion, encuesta_egresado.trabaja_actualmente AS encuesta_egresado_trabaja_actualmente, encuesta_egresado.tipo_contrato AS encuesta_egresado_tipo_contrato, encuesta_egresado.tipo_empleo AS encuesta_egresado_tipo_empleo, encuesta_egresado.ingreso_mensual AS encuesta_egresado_ingreso_mensual, encuesta_egresado.area_trabajo AS encuesta_egresado_area_trabajo, encuesta_egresado.actividad_economica_id AS encuesta_egresado_actividad_economica_id, encuesta_egresado.relacion_carrera AS encuesta_egresado_relacion_carrera, encuesta_egresado.medios_busqueda AS encuesta_egresado_medios_busqueda, encuesta_egresado.cantidad_empleos_ultimo_ano AS encuesta_egresado_cantidad_empleos_ultimo_ano, encuesta_egresado.cantidad_empleos_carrera AS encuesta_egresado_cantidad_empleos_carrera, encuesta_egresado.nombre_empresa_actual AS encuesta_egresado_nombre_empresa_actual, encuesta_egresado.nombre_jefe_inmediato AS encuesta_egresado_nombre_jefe_inmediato, encuesta_egresado.telefono_empresa AS encuesta_egresado_telefono_empresa, encuesta_egresado.pagina_web_empresa AS encuesta_egresado_pagina_web_empresa, encuesta_egresado.correo_empresa AS encuesta_egresado_correo_empresa, encuesta_egresado.tiene_negocio AS encuesta_egresado_tiene_negocio, encuesta_egresado.cantidad_trabajadores AS encuesta_egresado_cantidad_trabajadores, encuesta_egresado.tipo_constitucion AS encuesta_egresado_tipo_constitucion, encuesta_egresado.actividad_economica_negocio_id AS encuesta_egresado_actividad_economica_negocio_id, encuesta_egresado.estado AS encuesta_egresado_estado 
+FROM encuesta_egresado 
+WHERE encuesta_egresado.estado = %(estado_1)s ORDER BY encuesta_egresado.fecha_aplicacion DESC 
+ LIMIT %(param_1)s OFFSET %(param_2)s]
+[parameters: {'estado_1': 'A', 'param_1': 10, 'param_2': 0}]
+(Background on this error at: https://sqlalche.me/e/20/f405)Traceback (most recent call last):
+  File "C:\Users\PC\Desktop\proyecto-automatizacion\AS241S4_PII_T23-be\SegEgresados\Lib\site-packages\sqlalchemy\engine\base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        cursor, str_statement, effective_parameters, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\PC\Desktop\proyecto-automatizacion\AS241S4_PII_T23-be\SegEgresados\Lib\site-packages\sqlalchemy\engine\default.py", line 951, in do_execute
+    cursor.execute(statement, parameters)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+psycopg2.errors.UndefinedColumn: column encuesta_egresado.tipo_constitucion does not exist
+LINE 1: ...dores AS encuesta_egresado_cantidad_trabajadores, encuesta_e...
+                                                             ^
+HINT:  Perhaps you meant to reference the column "encuesta_egresado.tipo_constituccion".
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\PC\Desktop\proyecto-automatizacion\AS241S4_PII_T23-be\app\services\encuesta_egresado_service.py", line 72, in obtener_encuestas
+    pagination = query.paginate(page=page, per_page=per_page, error_out=False)
+  File "C:\Users\PC\Desktop\proyecto-automatizacion\AS241S4_PII_T23-be\SegEgresados\Lib\site-packages\flask_sqlalchemy\query.py", line 98, in paginate
+    return QueryPagination(
+        query=self,
+    ...<4 lines>...
+        count=count,
+    )
+  File "C:\Users\PC\Desktop\proyecto-automatizacion\AS241S4_PII_T23-be\SegEgresados\Lib\site-packages\flask_sqlalchemy\pagination.py", line 72, in __init__
+    items = self._query_items()
+  File "C:\Users\PC\Desktop\proyecto-automatizacion\AS241S4_PII_T23-be\SegEgresados\Lib\site-packages\flask_sqlalchemy\pagination.py", line 358, in _query_items
+    out = query.limit(self.per_page).offset(self._query_offset).all()
+  File "C:\Users\PC\Desktop\proyecto-automatizacion\AS241S4_PII_T23-be\SegEgresados\Lib\site-packages\sqlalchemy\orm\query.py", line 2704, in all
+    return self._iter().all()  # type: ignore
+           ~~~~~~~~~~^^
+  File "C:\Users\PC\Desktop\proyecto-automatizacion\AS241S4_PII_T23-be\SegEgresados\Lib\site-packages\sqlalchemy\orm\query.py", line 2857, in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+                                                  ~~~~~~~~~~~~~~~~~~~~^
+        statement,
+        ^^^^^^^^^^
+        params,
+        ^^^^^^^
+        execution_options={"_sa_orm_load_options": self.load_options},
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\PC\Desktop\proyecto-automatizacion\AS241S4_PII_T23-be\SegEgresados\Lib\site-packages\sqlalchemy\orm\session.py", line 2351, in execute
+    return self._execute_internal(
+           ~~~~~~~~~~~~~~~~~~~~~~^
+        statement,
+        ^^^^^^^^^^
+    ...<4 lines>...
+        _add_event=_add_event,
+        ^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\PC\Desktop\proyecto-automatizacion\AS241S4_PII_T23-be\SegEgresados\Lib\site-packages\sqlalchemy\orm\session.py", line 2249, in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self,
+        ^^^^^
+    ...<4 lines>...
+        conn,
+        ^^^^^
+    )
+    ^
+  File "C:\Users\PC\Desktop\proyecto-automatizacion\AS241S4_PII_T23-be\SegEgresados\Lib\site-packages\sqlalchemy\orm\context.py", line 306, in orm_execute_statement
+    result = conn.execute(
+        statement, params or {}, execution_options=execution_options
+    )
+  File "C:\Users\PC\Desktop\proyecto-automatizacion\AS241S4_PII_T23-be\SegEgresados\Lib\site-packages\sqlalchemy\engine\base.py", line 1419, in execute
+    return meth(
+        self,
+        distilled_parameters,
+        execution_options or NO_OPTIONS,
+    )
+  File "C:\Users\PC\Desktop\proyecto-automatizacion\AS241S4_PII_T23-be\SegEgresados\Lib\site-packages\sqlalchemy\sql\elements.py", line 526, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self, distilled_params, execution_options
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\PC\Desktop\proyecto-automatizacion\AS241S4_PII_T23-be\SegEgresados\Lib\site-packages\sqlalchemy\engine\base.py", line 1641, in _execute_clauseelement
+    ret = self._execute_context(
+        dialect,
+    ...<8 lines>...
+        cache_hit=cache_hit,
+    )
+  File "C:\Users\PC\Desktop\proyecto-automatizacion\AS241S4_PII_T23-be\SegEgresados\Lib\site-packages\sqlalchemy\engine\base.py", line 1846, in _execute_context
+    return self._exec_single_context(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        dialect, context, statement, parameters
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\PC\Desktop\proyecto-automatizacion\AS241S4_PII_T23-be\SegEgresados\Lib\site-packages\sqlalchemy\engine\base.py", line 1986, in _exec_single_context
+    self._handle_dbapi_exception(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        e, str_statement, effective_parameters, cursor, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\PC\Desktop\proyecto-automatizacion\AS241S4_PII_T23-be\SegEgresados\Lib\site-packages\sqlalchemy\engine\base.py", line 2355, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "C:\Users\PC\Desktop\proyecto-automatizacion\AS241S4_PII_T23-be\SegEgresados\Lib\site-packages\sqlalchemy\engine\base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        cursor, str_statement, effective_parameters, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\PC\Desktop\proyecto-automatizacion\AS241S4_PII_T23-be\SegEgresados\Lib\site-packages\sqlalchemy\engine\default.py", line 951, in do_execute
+    cursor.execute(statement, parameters)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+sqlalchemy.exc.ProgrammingError: (psycopg2.errors.UndefinedColumn) column encuesta_egresado.tipo_constitucion does not exist
+LINE 1: ...dores AS encuesta_egresado_cantidad_trabajadores, encuesta_e...
+                                                             ^
+HINT:  Perhaps you meant to reference the column "encuesta_egresado.tipo_constituccion".
+
+[SQL: SELECT encuesta_egresado.id_encuesta AS encuesta_egresado_id_encuesta, encuesta_egresado.codigo_egresado AS encuesta_egresado_codigo_egresado, encuesta_egresado.fecha_aplicacion AS encuesta_egresado_fecha_aplicacion, encuesta_egresado.trabaja_actualmente AS encuesta_egresado_trabaja_actualmente, encuesta_egresado.tipo_contrato AS encuesta_egresado_tipo_contrato, encuesta_egresado.tipo_empleo AS encuesta_egresado_tipo_empleo, encuesta_egresado.ingreso_mensual AS encuesta_egresado_ingreso_mensual, encuesta_egresado.area_trabajo AS encuesta_egresado_area_trabajo, encuesta_egresado.actividad_economica_id AS encuesta_egresado_actividad_economica_id, encuesta_egresado.relacion_carrera AS encuesta_egresado_relacion_carrera, encuesta_egresado.medios_busqueda AS encuesta_egresado_medios_busqueda, encuesta_egresado.cantidad_empleos_ultimo_ano AS encuesta_egresado_cantidad_empleos_ultimo_ano, encuesta_egresado.cantidad_empleos_carrera AS encuesta_egresado_cantidad_empleos_carrera, encuesta_egresado.nombre_empresa_actual AS encuesta_egresado_nombre_empresa_actual, encuesta_egresado.nombre_jefe_inmediato AS encuesta_egresado_nombre_jefe_inmediato, encuesta_egresado.telefono_empresa AS encuesta_egresado_telefono_empresa, encuesta_egresado.pagina_web_empresa AS encuesta_egresado_pagina_web_empresa, encuesta_egresado.correo_empresa AS encuesta_egresado_correo_empresa, encuesta_egresado.tiene_negocio AS encuesta_egresado_tiene_negocio, encuesta_egresado.cantidad_trabajadores AS encuesta_egresado_cantidad_trabajadores, encuesta_egresado.tipo_constitucion AS encuesta_egresado_tipo_constitucion, encuesta_egresado.actividad_economica_negocio_id AS encuesta_egresado_actividad_economica_negocio_id, encuesta_egresado.estado AS encuesta_egresado_estado 
+FROM encuesta_egresado 
+WHERE encuesta_egresado.estado = %(estado_1)s ORDER BY encuesta_egresado.fecha_aplicacion DESC 
+ LIMIT %(param_1)s OFFSET %(param_2)s]
+[parameters: {'estado_1': 'A', 'param_1': 10, 'param_2': 0}]
+(Background on this error at: https://sqlalche.me/e/20/f405)

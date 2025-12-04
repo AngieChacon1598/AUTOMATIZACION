@@ -10,11 +10,11 @@ from ..services.encuesta_egresado_service import (
 from ..services.usuario_service import require_auth
 from .. import db
 
-# Crear Blueprint para rutas de encuestas
-encuesta_egresado_bp = Blueprint('encuesta_egresado', __name__)
+# Crear Blueprint para rutas de encuestas con prefijo /api/crud
+encuesta_egresado_bp = Blueprint('encuesta_egresado', __name__, url_prefix='/api/crud')
 
 
-@encuesta_egresado_bp.route('/encuestas', methods=['GET'])
+@encuesta_egresado_bp.route('/encuestas-egresados', methods=['GET'])
 def listar_encuestas():
     """Obtener lista de encuestas de egresados con paginación"""
 
@@ -61,7 +61,7 @@ def listar_encuestas():
     return jsonify(encuestas)
 
 
-@encuesta_egresado_bp.route('/encuestas', methods=['POST'])
+@encuesta_egresado_bp.route('/encuestas-egresados', methods=['POST'])
 @require_auth
 def agregar_encuesta():
     """Agregar nueva encuesta de egresado"""
@@ -81,14 +81,14 @@ def agregar_encuesta():
     return jsonify(resultado), codigo_respuesta
 
 
-@encuesta_egresado_bp.route('/encuestas/<int:id_encuesta>', methods=['GET'])
+@encuesta_egresado_bp.route('/encuestas-egresados/<int:id_encuesta>', methods=['GET'])
 def obtener_una_encuesta(id_encuesta):
     """Obtener una encuesta específica"""
     resultado, codigo_respuesta = obtener_encuesta(id_encuesta)
     return jsonify(resultado), codigo_respuesta
 
 
-@encuesta_egresado_bp.route('/encuestas/<int:id_encuesta>', methods=['PUT'])
+@encuesta_egresado_bp.route('/encuestas-egresados/<int:id_encuesta>', methods=['PUT'])
 @require_auth
 def editar_encuesta(id_encuesta):
     """Editar encuesta existente"""
@@ -108,14 +108,14 @@ def editar_encuesta(id_encuesta):
     return jsonify(resultado), codigo_respuesta
 
 
-@encuesta_egresado_bp.route('/encuestas/<int:id_encuesta>', methods=['DELETE'])
+@encuesta_egresado_bp.route('/encuestas-egresados/<int:id_encuesta>', methods=['DELETE'])
 @require_auth
 def eliminar_encuesta(id_encuesta):
     """Eliminar encuesta lógicamente"""
     resultado, codigo_respuesta = eliminar_encuesta_logica(id_encuesta)
     return jsonify(resultado), codigo_respuesta
 
-@encuesta_egresado_bp.route('/encuestas/restaurar/<int:id_encuesta>', methods=['PATCH'])
+@encuesta_egresado_bp.route('/encuestas-egresados/restaurar/<int:id_encuesta>', methods=['PATCH'])
 @require_auth
 def restaurar_encuesta(id_encuesta):
     """Eliminar encuesta lógicamente"""
@@ -123,7 +123,7 @@ def restaurar_encuesta(id_encuesta):
     return jsonify(resultado), codigo_respuesta
 
 
-@encuesta_egresado_bp.route('/encuestas/estadisticas', methods=['GET'])
+@encuesta_egresado_bp.route('/encuestas-egresados/estadisticas', methods=['GET'])
 def estadisticas_encuestas():
     """Obtener estadísticas de encuestas"""
     codigo_egresado = request.args.get('codigo_egresado')
